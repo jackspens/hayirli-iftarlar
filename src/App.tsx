@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Countdown } from './components/Countdown';
 import { Timetable } from './components/Timetable';
 import { getNextEvent, NextEvent } from './utils/timeTracker';

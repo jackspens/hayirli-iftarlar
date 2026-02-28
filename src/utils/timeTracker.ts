@@ -1,5 +1,5 @@
-import { parse, differenceInSeconds, isBefore, isAfter, startOfDay, addDays } from 'date-fns';
-import { ISTANBUL_IMSAKIYE_2026, PrayerTime } from './imsakiye';
+import { parse, differenceInSeconds, isBefore, addDays } from 'date-fns';
+import { ISTANBUL_IMSAKIYE_2026, PrayerTime } from '../data/imsakiye';
 
 export type NextEvent = {
     type: 'imsak' | 'aksam';
@@ -13,7 +13,7 @@ export function getNextEvent(now: Date): NextEvent | null {
     const currentDayStr = now.toISOString().split('T')[0];
 
     // Find today's data
-    let todayData = ISTANBUL_IMSAKIYE_2026.find(d => d.date === currentDayStr);
+    let todayData = ISTANBUL_IMSAKIYE_2026.find((d: PrayerTime) => d.date === currentDayStr);
 
     if (!todayData) {
         // If we're before Ramazan, return the first day's Imsak
@@ -56,7 +56,7 @@ export function getNextEvent(now: Date): NextEvent | null {
     } else {
         // After Iftar, look for next day's Imsak
         const tomorrowStr = addDays(now, 1).toISOString().split('T')[0];
-        const tomorrowData = ISTANBUL_IMSAKIYE_2026.find(d => d.date === tomorrowStr);
+        const tomorrowData = ISTANBUL_IMSAKIYE_2026.find((d: PrayerTime) => d.date === tomorrowStr);
 
         if (tomorrowData) {
             const nextImsakTime = parse(`${tomorrowData.date} ${tomorrowData.imsak}`, 'yyyy-MM-dd HH:mm', new Date());
