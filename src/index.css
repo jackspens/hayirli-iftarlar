@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-slate-950 text-slate-100 antialiased font-sans flex flex-col min-h-[100dvh];
+    }
+}
+
+.glass-panel {
+    @apply bg-slate-900/60 backdrop-blur-md border border-slate-700/50 rounded-2xl shadow-xl;
+}
+
+/* Optional smooth pulse for countdown */
+@keyframes softPulse {
+    0% {
+        opacity: 0.8;
+    }
+
+    50% {
+        opacity: 1;
+        text-shadow: 0 0 20px rgba(246, 205, 74, 0.4);
+    }
+
+    100% {
+        opacity: 0.8;
+    }
+}
+
+.animate-soft-pulse {
+    animation: softPulse 2s ease-in-out infinite;
+}
