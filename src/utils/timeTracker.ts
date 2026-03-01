@@ -18,7 +18,10 @@ export type DayEvents = {
 };
 
 export function getDayEvents(now: Date, data: PrayerTime[] = ISTANBUL_IMSAKIYE_2026): DayEvents {
-    const currentDayStr = now.toISOString().split('T')[0];
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const currentDayStr = `${year}-${month}-${day}`;
 
     // Find today's data
     let todayData = data.find((d: PrayerTime) => d.date === currentDayStr);
