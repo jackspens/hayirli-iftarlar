@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NextEvent, formatDuration } from '../utils/timeTracker';
 import { Clock } from 'lucide-react';
 import clsx from 'clsx';
@@ -9,7 +9,7 @@ export const Countdown = ({ event, isPrimary }: { event: NextEvent; isPrimary?: 
     useEffect(() => {
         setTimeLeft(event.diffSeconds);
         const interval = setInterval(() => {
-            setTimeLeft((prev) => Math.max(0, prev - 1));
+            setTimeLeft((prev: number) => Math.max(0, prev - 1));
         }, 1000);
         return () => clearInterval(interval);
     }, [event]);
@@ -26,7 +26,7 @@ export const Countdown = ({ event, isPrimary }: { event: NextEvent; isPrimary?: 
     return (
         <div className={clsx(
             "text-center relative overflow-hidden transition-all duration-500 rounded-3xl border shadow-2xl",
-            isIftar ? "bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 border-emerald-500/30" : "glass-panel",
+            isIftar ? "bg-[#020617] border-emerald-500/20 shadow-emerald-950/20" : "glass-panel",
             isPrimary ? "p-6 sm:p-8" : "p-3 sm:p-4 opacity-90 scale-95",
             borderClass
         )}>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Countdown } from './components/Countdown';
 import { Timetable } from './components/Timetable';
 import { MonthTimetable } from './components/MonthTimetable';
@@ -56,23 +56,23 @@ function App() {
                         </div>
                         <div>
                             <h1 className="text-2xl font-black text-slate-100 tracking-tight">Hayırlı İftarlar</h1>
-                            <div className="relative group mt-1 inline-flex items-center gap-1.5 cursor-pointer">
+                            <div className="relative group mt-1.5 inline-flex items-center gap-2 bg-slate-900/60 px-3 py-1.5 rounded-lg border border-emerald-500/30 cursor-pointer hover:border-emerald-500/60 transition-all shadow-lg active:scale-95">
                                 <MapPin size={12} className="text-emerald-500" />
                                 <select
                                     value={selectedCity}
-                                    onChange={(e) => setSelectedCity(e.target.value)}
-                                    className="bg-transparent text-emerald-400 font-bold text-xs appearance-none outline-none pr-4 hover:text-emerald-300 transition-colors"
+                                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedCity(e.target.value)}
+                                    className="bg-transparent text-emerald-400 font-bold text-[11px] appearance-none outline-none pr-5 cursor-pointer"
                                 >
                                     {CITIES.map(city => (
                                         <option key={city} value={city} className="bg-slate-900 text-slate-100">{city}</option>
                                     ))}
                                 </select>
-                                <ChevronDown size={10} className="text-emerald-500 absolute right-0 pointer-events-none group-hover:translate-y-0.5 transition-transform" />
+                                <ChevronDown size={12} className="text-emerald-500 absolute right-2 pointer-events-none group-hover:translate-y-0.5 transition-transform" />
                             </div>
                         </div>
                     </div>
-                    <div className="flex items-center gap-2 text-slate-400 text-[10px] sm:text-xs font-medium bg-slate-900/50 px-3 py-1.5 rounded-xl border border-slate-800">
-                        <CalendarDays size={14} className="text-emerald-500/50" />
+                    <div className="flex items-center gap-2 text-slate-300 text-[10px] sm:text-xs font-semibold bg-slate-950/60 px-3 py-2 rounded-xl border border-slate-800 shadow-xl">
+                        <CalendarDays size={14} className="text-emerald-500" />
                         {events.currentDateStr}
                     </div>
                 </div>
