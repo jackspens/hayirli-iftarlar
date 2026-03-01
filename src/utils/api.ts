@@ -10,13 +10,18 @@ export async function fetchPrayerTimes(city: string, year: number, month: number
         const data = await response.json();
 
         if (data.code === 200) {
-            return data.data.map((day: any) => {
-                const date = day.date.readable; // Need to convert this to YYYY-MM-DD
+            return data.data.map((day: any, index: number) => {
                 const isoDate = day.date.iso; // "2026-03-01"
                 const timings = day.timings;
 
+                // Helper for Turkish long date
+                const dateObj = new Date(isoDate);
+                const longDateStr = dateObj.toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric', weekday: 'long' });
+
                 return {
-                    day: day.date.day,
+                    dayIndex: index + 1,
+                    dayStr: `${index + 1}. Gün`,
+                    longDateStr: longDateStr,
                     date: isoDate,
                     imsak: timings.Fajr.split(' ')[0],
                     gunes: timings.Sunrise.split(' ')[0],

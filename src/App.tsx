@@ -105,7 +105,10 @@ function App() {
                             />
                         )}
 
-                        <MonthTimetable customData={selectedCity === 'İstanbul' ? ISTANBUL_IMSAKIYE_2026 : currentPrayerData} />
+                        <MonthTimetable
+                            customData={currentPrayerData}
+                            city={selectedCity}
+                        />
                     </>
                 )}
             </main>
