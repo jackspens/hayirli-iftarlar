@@ -21,11 +21,7 @@ function App() {
             const data = await fetchFullRamazanData(city);
             setImsakiye(data);
             if (data.length > 0) {
-                const now = new Date();
-                const dayEvents = getDayEvents(now, data);
-                console.log(`[App] Current Date: ${now.toISOString()}`);
-                console.log('[App] Calculated dayEvents:', dayEvents);
-                setEvents(dayEvents);
+                setEvents(getDayEvents(new Date(), data));
             } else {
                 setEvents(getDayEvents(new Date(), []));
             }
@@ -46,8 +42,7 @@ function App() {
         if (imsakiye.length === 0) return;
 
         const interval = setInterval(() => {
-            const now = new Date();
-            setEvents(getDayEvents(now, imsakiye));
+            setEvents(getDayEvents(new Date(), imsakiye));
         }, 1000);
         return () => clearInterval(interval);
     }, [imsakiye]);
