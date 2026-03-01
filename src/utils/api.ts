@@ -47,9 +47,14 @@ async function fetchPrayerTimes(city: string, year: number, month: number): Prom
 
         if (data.code === 200 && Array.isArray(data.data)) {
             return data.data.map((day: any) => {
-                const isoDate = day.date.iso; // "2026-03-01"
+                // Aladhan API: day.date.gregorian.date is typically "DD-MM-YYYY"
+                const rawDate = day.date.gregorian.date;
                 const timings = day.timings;
-                const dateObj = new Date(isoDate);
+
+                // Parse DD-MM-YYYY to Date object
+                const parts = rawDate.split('-');
+                const dateObj = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+                const isoDate = dateObj.toISOString().split('T')[0]; // "YYYY-MM-DD"
                 const longDateStr = dateObj.toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric', weekday: 'long' });
 
                 return {
