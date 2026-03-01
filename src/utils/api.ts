@@ -16,13 +16,12 @@ export async function fetchFullRamazanData(city: string): Promise<PrayerTime[]> 
     ]);
 
     // Ramazan 2026 starts on Feb 19.
-    // We filter to get the 30 days of Ramazan.
     const combined = [...febData, ...marchData];
     const ramazanStart = '2026-02-19';
     const startIndex = combined.findIndex(d => d.date && d.date.includes(ramazanStart));
 
     if (startIndex === -1) {
-        console.warn('Ramazan start date not found in:', combined.map(d => d.date));
+        console.warn(`[API] Start date ${ramazanStart} not found. Available:`, combined.slice(0, 3).map(d => d.date));
         return [];
     }
 
