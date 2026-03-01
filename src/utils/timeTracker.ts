@@ -68,7 +68,7 @@ export function getDayEvents(now: Date, data: PrayerTime[] = ISTANBUL_IMSAKIYE_2
         const tomorrowData = data.find((d: PrayerTime) => d.date === tomorrowStr);
         if (tomorrowData) {
             const nextImsakTime = parse(`${tomorrowData.date} ${tomorrowData.imsak}`, 'yyyy-MM-dd HH:mm', new Date());
-            activeImsak = { type: 'imsak', label: 'Yarının Sahuruna Kalan Süre', timeStr: tomorrowData.imsak, diffSeconds: differenceInSeconds(nextImsakTime, now), prayerData: tomorrowData };
+            activeImsak = { type: 'imsak', label: 'İmsak Vaktine (Sahur)', timeStr: tomorrowData.imsak, diffSeconds: differenceInSeconds(nextImsakTime, now), prayerData: tomorrowData };
         }
     } else {
         // After Iftar, look for next day's Imsak and next day's Iftar
@@ -79,8 +79,8 @@ export function getDayEvents(now: Date, data: PrayerTime[] = ISTANBUL_IMSAKIYE_2
             const nextImsakTime = parse(`${tomorrowData.date} ${tomorrowData.imsak}`, 'yyyy-MM-dd HH:mm', new Date());
             const nextIftarTime = parse(`${tomorrowData.date} ${tomorrowData.aksam}`, 'yyyy-MM-dd HH:mm', new Date());
 
-            activeImsak = { type: 'imsak', label: 'Yarının İmsak Vaktine (Sahur)', timeStr: tomorrowData.imsak, diffSeconds: differenceInSeconds(nextImsakTime, now), prayerData: tomorrowData };
-            activeIftar = { type: 'aksam', label: 'Yarının İftar Vaktine', timeStr: tomorrowData.aksam, diffSeconds: differenceInSeconds(nextIftarTime, now), prayerData: tomorrowData };
+            activeImsak = { type: 'imsak', label: 'İmsak Vaktine (Sahur)', timeStr: tomorrowData.imsak, diffSeconds: differenceInSeconds(nextImsakTime, now), prayerData: tomorrowData };
+            activeIftar = { type: 'aksam', label: 'İftar Vaktine Kalan Süre', timeStr: tomorrowData.aksam, diffSeconds: differenceInSeconds(nextIftarTime, now), prayerData: tomorrowData };
 
             // We want tomorrow's prayer data to show in the table if it's past Iftar (common preference)
             todayData = tomorrowData;

@@ -6,6 +6,7 @@ import { getDayEvents, DayEvents } from './utils/timeTracker';
 import { MoonStar, CalendarDays, MapPin, ChevronDown } from 'lucide-react';
 import { ISTANBUL_IMSAKIYE_2026, PrayerTime } from './data/imsakiye';
 import { fetchPrayerTimes } from './utils/api';
+import { InstallPrompt } from './components/InstallPrompt';
 
 const CITIES = ['İstanbul', 'Ankara', 'İzmir', 'Bursa', 'Çanakkale'];
 
@@ -24,7 +25,6 @@ function App() {
 
             setIsLoading(true);
             const now = new Date();
-            // Fetch current and potentially next month if we're near month-end
             const times = await fetchPrayerTimes(selectedCity, now.getFullYear(), now.getMonth() + 1);
             if (times.length > 0) {
                 setCurrentPrayerData(times);
@@ -88,8 +88,17 @@ function App() {
                     <>
                         {events.activeImsak || events.activeIftar ? (
                             <div className="flex flex-col gap-3">
-                                {events.activeIftar && <Countdown event={events.activeIftar} isPrimary={true} />}
-                                {events.activeImsak && <Countdown event={events.activeImsak} isPrimary={false} />}
+                                {[events.activeIftar, events.activeImsak]
+                                    .filter((e): e is NonNullable<typeof e> => !!e)
+                                    .sort((a, b) => a.diffSeconds - b.diffSeconds)
+                                    .map((event, idx) => (
+                                        <Countdown
+                                            key={event.type}
+                                            event={event}
+                                            isPrimary={idx === 0}
+                                        />
+                                    ))
+                                }
                             </div>
                         ) : (
                             <div className="glass-panel p-8 text-center mt-6">
@@ -119,6 +128,8 @@ function App() {
                 <p className="text-[10px] opacity-50">Son güncelleme: 1 Mart 2026</p>
                 <p className="pt-2">&copy; 2026 Hayırlı İftarlar</p>
             </footer>
+
+            <InstallPrompt />
         </div>
     );
 }
