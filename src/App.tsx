@@ -61,9 +61,11 @@ function App() {
                 <MonthTimetable />
             </main>
 
-            <footer className="w-full mt-10 text-center text-xs text-slate-500 font-medium">
-                Veriler referans takvimler baz alınarak hesaplanmıştır.<br />
-                &copy; 2026 Hayırlı İftarlar
+            <footer className="w-full mt-10 text-center text-xs text-slate-500 font-medium pb-12 border-t border-slate-800/50 pt-8 space-y-2">
+                <p>Veriler referans takvimler baz alınarak hesaplanmıştır.</p>
+                <p className="text-slate-400">Bu site <span className="text-emerald-500 font-bold">Ersin Uçan</span> tarafından yapılmıştır.</p>
+                <p className="text-[10px] opacity-50">Son güncelleme: 1 Mart 2026</p>
+                <p className="pt-2">&copy; 2026 Hayırlı İftarlar</p>
             </footer>
         </div>
     );
