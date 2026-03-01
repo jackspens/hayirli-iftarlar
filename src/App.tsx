@@ -17,11 +17,15 @@ function App() {
 
     const loadData = useCallback(async (city: string) => {
         setLoading(true);
+        console.log(`Loading data for ${city}...`);
         try {
             const data = await fetchFullRamazanData(city);
+            console.log(`Fetched ${data.length} days of data for ${city}`);
             setImsakiye(data);
             if (data.length > 0) {
-                setEvents(getDayEvents(new Date(), data));
+                const dayEvents = getDayEvents(new Date(), data);
+                console.log('Initially calculated dayEvents:', dayEvents);
+                setEvents(dayEvents);
             } else {
                 setEvents(getDayEvents(new Date(), []));
             }
@@ -41,11 +45,9 @@ function App() {
     useEffect(() => {
         if (imsakiye.length === 0) return;
 
-        const update = () => {
-            setEvents(getDayEvents(new Date(), imsakiye));
-        };
-
-        const interval = setInterval(update, 1000);
+        const interval = setInterval(() => {
+            setEvents(getDayEvents(new Date('2026-03-01T12:00:00'), imsakiye));
+        }, 1000);
         return () => clearInterval(interval);
     }, [imsakiye]);
 
