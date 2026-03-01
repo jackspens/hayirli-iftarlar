@@ -19,9 +19,12 @@ export async function fetchFullRamazanData(city: string): Promise<PrayerTime[]> 
     // We filter to get the 30 days of Ramazan.
     const combined = [...febData, ...marchData];
     const ramazanStart = '2026-02-19';
-    const startIndex = combined.findIndex(d => d.date === ramazanStart);
+    const startIndex = combined.findIndex(d => d.date && d.date.includes(ramazanStart));
 
-    if (startIndex === -1) return [];
+    if (startIndex === -1) {
+        console.warn('Ramazan start date not found in:', combined.map(d => d.date));
+        return [];
+    }
 
     return combined.slice(startIndex, startIndex + 30).map((day, idx) => ({
         ...day,
