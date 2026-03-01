@@ -14,6 +14,7 @@ function App() {
     const [events, setEvents] = useState<DayEvents | null>(null);
     const [showInstallPrompt, setShowInstallPrompt] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [visitorCount, setVisitorCount] = useState(1000);
 
     const loadData = useCallback(async (city: string) => {
         setLoading(true);
@@ -31,6 +32,21 @@ function App() {
             setEvents(getDayEvents(new Date(), []));
         } finally {
             setLoading(false);
+        }
+    }, []);
+
+    // Visitor counter: starts at 1000, increments once per browser session
+    useEffect(() => {
+        const BASE = 1000;
+        const stored = parseInt(localStorage.getItem('hi_visitor_count') ?? String(BASE), 10);
+        const sessionKey = 'hi_visited_this_session';
+        if (!sessionStorage.getItem(sessionKey)) {
+            const next = stored + 1;
+            localStorage.setItem('hi_visitor_count', String(next));
+            sessionStorage.setItem(sessionKey, '1');
+            setVisitorCount(next);
+        } else {
+            setVisitorCount(stored);
         }
     }, []);
 
@@ -159,11 +175,7 @@ function App() {
 
                     <div className="mt-4 flex flex-col items-center gap-2 opacity-60 hover:opacity-100 transition-all">
                         <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">Ziyaretçi Sayısı</span>
-                        <img
-                            src="https://visitor-badge.laobi.icu/badge?page_id=jackspens.hayirli-iftarlar&left_color=%231e293b&right_color=%2310b981&left_text=ziyaret%C3%A7i"
-                            alt="Visitor Count"
-                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                        />
+                        <span className="text-emerald-400 font-mono font-black text-lg">{visitorCount.toLocaleString('tr-TR')}</span>
                     </div>
 
                     <p className="pt-2 text-[10px]">&copy; 2026 Hayırlı İftarlar</p>

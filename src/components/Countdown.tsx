@@ -77,7 +77,7 @@ export const Countdown = ({ event, isPrimary }: { event: NextEvent; isPrimary?: 
                     event.nextDayTime && (
                         <div className="mt-3 text-[10px] sm:text-xs font-bold text-slate-500 flex items-center justify-center gap-2">
                             <div className="w-1 h-1 rounded-full bg-emerald-500/40" />
-                            <span>Yarının İftar Vakti: <span className="text-emerald-400/80">{event.nextDayTime}</span></span>
+                            <span>{event.nextDayLabel ?? 'Yarının İftar Vakti'}: <span className="text-emerald-400/80">{event.nextDayTime}</span></span>
                         </div>
                     )
                 )}
