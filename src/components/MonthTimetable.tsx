@@ -1,4 +1,3 @@
-import React from 'react';
 import { ISTANBUL_IMSAKIYE_2026 } from '../data/imsakiye';
 import { isBefore, parse, startOfDay } from 'date-fns';
 import clsx from 'clsx';
