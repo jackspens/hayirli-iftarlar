@@ -17,9 +17,9 @@ export const Countdown = ({ event, isPrimary }: { event: NextEvent; isPrimary?: 
     const { h, m, s } = formatDuration(timeLeft);
     const isIftar = event.type === 'aksam';
 
-    // Refined Dark Modern Theme: Darker, harmonized with Sahur but distinct.
-    const borderClass = isIftar ? "border-emerald-500/20" : "border-cyan-500/30";
-    const glowClass = isIftar ? "bg-emerald-600" : "bg-cyan-500";
+    // Solid Dark Theme: Remove the bright green glow to achieve the "dark" look requested.
+    const borderClass = isIftar ? "border-emerald-500/30" : "border-cyan-500/30";
+    const glowClass = isIftar ? "bg-emerald-950/40" : "bg-cyan-900/20";
     const textClass = isIftar ? "text-emerald-400" : "text-cyan-300";
     const titleIconClass = isIftar ? "text-emerald-500/80" : "text-cyan-400";
 
