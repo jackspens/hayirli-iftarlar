@@ -57,7 +57,7 @@ function App() {
     }
 
     const ramazanDay = events.prayerData?.dayIndex || 0;
-    const totalDays = imsakiye.length || 30;
+    const totalDays = imsakiye.length || 29;
     const daysLeft = totalDays - ramazanDay;
 
     return (
@@ -153,8 +153,8 @@ function App() {
 
                     <div className="space-y-1">
                         <p>Veriler referans takvimler baz alınarak hesaplanmıştır.</p>
-                        <p className="text-slate-400">Bu site <span className="text-emerald-500 font-bold">Ersin Uçan</span> tarafından hazırlanmıştır.</p>
-                        <p className="text-[10px] opacity-50">Son güncelleme: 1 Mart 2026</p>
+                        <p className="text-slate-400">Bu site <a href="mailto:ersinucan@yandex.com" className="text-emerald-500 font-bold hover:underline transition-all">Mr. EU</a> tarafından hazırlanmıştır.</p>
+                        <p className="text-[10px] opacity-50">Son güncelleme: {new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                     </div>
 
                     <div className="mt-4 flex flex-col items-center gap-2 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all">

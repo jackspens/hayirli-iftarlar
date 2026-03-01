@@ -25,7 +25,8 @@ export async function fetchFullRamazanData(city: string): Promise<PrayerTime[]> 
         return [];
     }
 
-    return combined.slice(startIndex, startIndex + 30).map((day, idx) => ({
+    // Ramazan 2026 is 29 days.
+    return combined.slice(startIndex, startIndex + 29).map((day, idx) => ({
         ...day,
         dayIndex: idx + 1,
         dayStr: `${idx + 1}. Gün`
@@ -51,10 +52,15 @@ async function fetchPrayerTimes(city: string, year: number, month: number): Prom
                 const rawDate = day.date.gregorian.date;
                 const timings = day.timings;
 
-                // Parse DD-MM-YYYY to Date object
+                // Parse DD-MM-YYYY to Date object robustly
                 const parts = rawDate.split('-');
-                const dateObj = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-                const isoDate = dateObj.toISOString().split('T')[0]; // "YYYY-MM-DD"
+                const dayVal = parseInt(parts[0]);
+                const monthVal = parseInt(parts[1]);
+                const yearVal = parseInt(parts[2]);
+                const dateObj = new Date(yearVal, monthVal - 1, dayVal);
+
+                // Manual ISO formatting to avoid TZ shifts
+                const isoDate = `${yearVal}-${monthVal.toString().padStart(2, '0')}-${dayVal.toString().padStart(2, '0')}`;
                 const longDateStr = dateObj.toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric', weekday: 'long' });
 
                 return {
