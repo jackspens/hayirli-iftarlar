@@ -1,30 +1,61 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Countdown } from './components/Countdown';
 import { Timetable } from './components/Timetable';
 import { MonthTimetable } from './components/MonthTimetable';
 import { getDayEvents, DayEvents } from './utils/timeTracker';
-import { MoonStar, CalendarDays, MonitorDown } from 'lucide-react';
-import { ISTANBUL_IMSAKIYE_2026, PrayerTime } from './data/imsakiye';
+import { MoonStar, CalendarDays, MonitorDown, MapPin, ChevronDown } from 'lucide-react';
+import { PrayerTime } from './data/imsakiye';
 import { InstallPrompt } from './components/InstallPrompt';
+import { fetchFullRamazanData, MAJOR_CITIES } from './utils/api';
 
 function App() {
+    const [selectedCity, setSelectedCity] = useState('İstanbul');
+    const [imsakiye, setImsakiye] = useState<PrayerTime[]>([]);
     const [events, setEvents] = useState<DayEvents | null>(null);
     const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const update = () => {
-            setEvents(getDayEvents(new Date(), ISTANBUL_IMSAKIYE_2026));
-        };
-
-        update();
-        const interval = setInterval(update, 1000);
-        return () => clearInterval(interval);
+    const loadData = useCallback(async (city: string) => {
+        setLoading(true);
+        try {
+            const data = await fetchFullRamazanData(city);
+            if (data.length > 0) {
+                setImsakiye(data);
+                setEvents(getDayEvents(new Date(), data));
+            }
+        } catch (error) {
+            console.error('Failed to load data:', error);
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
-    if (!events) return null;
+    useEffect(() => {
+        loadData(selectedCity);
+    }, [selectedCity, loadData]);
+
+    useEffect(() => {
+        if (imsakiye.length === 0) return;
+
+        const update = () => {
+            setEvents(getDayEvents(new Date(), imsakiye));
+        };
+
+        const interval = setInterval(update, 1000);
+        return () => clearInterval(interval);
+    }, [imsakiye]);
+
+    if (loading || !events) {
+        return (
+            <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-emerald-500 gap-4">
+                <div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
+                <span className="text-xs font-bold uppercase tracking-widest animate-pulse">Dualar Yükleniyor...</span>
+            </div>
+        );
+    }
 
     const ramazanDay = events.prayerData?.dayIndex || 0;
-    const totalDays = ISTANBUL_IMSAKIYE_2026.length;
+    const totalDays = imsakiye.length || 30;
     const daysLeft = totalDays - ramazanDay;
 
     return (
@@ -37,8 +68,20 @@ function App() {
                         </div>
                         <div>
                             <h1 className="text-2xl font-black text-slate-100 tracking-tight">Hayırlı İftarlar</h1>
-                            <div className="flex items-center gap-1.5 mt-1">
-                                <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider bg-emerald-500/10 px-2 py-0.5 rounded-md">İstanbul</span>
+                            <div className="relative mt-1 group">
+                                <div className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500/10 rounded-lg border border-emerald-500/20 text-emerald-500 cursor-pointer hover:bg-emerald-500/20 transition-all">
+                                    <MapPin size={12} />
+                                    <select
+                                        value={selectedCity}
+                                        onChange={(e) => setSelectedCity(e.target.value)}
+                                        className="bg-transparent border-none outline-none text-[10px] font-bold uppercase tracking-wider appearance-none pr-4 cursor-pointer"
+                                    >
+                                        {MAJOR_CITIES.map(city => (
+                                            <option key={city} value={city} className="bg-slate-900 text-slate-100">{city}</option>
+                                        ))}
+                                    </select>
+                                    <ChevronDown size={10} className="absolute right-2 pointer-events-none" />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -91,8 +134,8 @@ function App() {
                 )}
 
                 <MonthTimetable
-                    customData={ISTANBUL_IMSAKIYE_2026}
-                    city="İstanbul"
+                    customData={imsakiye}
+                    city={selectedCity}
                 />
             </main>
 

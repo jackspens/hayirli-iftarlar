@@ -64,15 +64,22 @@ export const Countdown = ({ event, isPrimary }: { event: NextEvent; isPrimary?: 
                     </div>
                 </div>
 
-                {isPrimary && (
+                {isPrimary ? (
                     <div className="mt-6 sm:mt-8 flex flex-col items-center pb-2">
                         <span className={clsx("text-sm sm:text-base font-medium tracking-wide mb-1", isIftar ? "text-emerald-500/50" : "text-slate-400")}>
-                            {isIftar ? 'İftar vakti' : 'Sahur vakti'}
+                            {isIftar ? 'İftar vakti' : 'İmsak'}
                         </span>
                         <strong className={clsx("text-4xl sm:text-5xl font-black", isIftar ? "text-amber-400" : "text-slate-200")}>
                             {event.timeStr}
                         </strong>
                     </div>
+                ) : (
+                    event.nextDayTime && (
+                        <div className="mt-3 text-[10px] sm:text-xs font-bold text-slate-500 flex items-center justify-center gap-2">
+                            <div className="w-1 h-1 rounded-full bg-emerald-500/40" />
+                            <span>Yarının İftar Vakti: <span className="text-emerald-400/80">{event.nextDayTime}</span></span>
+                        </div>
+                    )
                 )}
             </div>
         </div>

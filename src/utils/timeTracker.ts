@@ -7,6 +7,7 @@ export type NextEvent = {
     timeStr: string;
     diffSeconds: number;
     prayerData: PrayerTime;
+    nextDayTime?: string;
 };
 
 export type DayEvents = {
@@ -36,10 +37,10 @@ export function getDayEvents(now: Date, data: PrayerTime[] = ISTANBUL_IMSAKIYE_2
 
             return {
                 activeImsak: {
-                    type: 'imsak', label: 'İlk Sahura Kalan Süre', timeStr: data[0].imsak, diffSeconds: differenceInSeconds(imsakTime, now), prayerData: data[0]
+                    type: 'imsak', label: 'Sahura Ne kadar Kaldı?', timeStr: data[0].imsak, diffSeconds: differenceInSeconds(imsakTime, now), prayerData: data[0]
                 },
                 activeIftar: {
-                    type: 'aksam', label: 'İlk İftara Kalan Süre', timeStr: data[0].aksam, diffSeconds: differenceInSeconds(iftarTime, now), prayerData: data[0]
+                    type: 'aksam', label: 'İftar Vaktine Kalan Süre', timeStr: data[0].aksam, diffSeconds: differenceInSeconds(iftarTime, now), prayerData: data[0]
                 },
                 prayerData: data[0],
                 currentDateStr: localizedDateStr
@@ -55,34 +56,56 @@ export function getDayEvents(now: Date, data: PrayerTime[] = ISTANBUL_IMSAKIYE_2
     let activeImsak: NextEvent | null = null;
     let activeIftar: NextEvent | null = null;
 
+    // Tomorrow's data for "next day" info
+    const tomorrowStr = addDays(now, 1).toISOString().split('T')[0];
+    const tomorrowData = data.find((d: PrayerTime) => d.date === tomorrowStr);
+
     if (isBefore(now, imsakTime)) {
         // Time before Imsak (midnight to Sahur)
-        activeImsak = { type: 'imsak', label: 'İmsak Vaktine (Sahur)', timeStr: todayData.imsak, diffSeconds: differenceInSeconds(imsakTime, now), prayerData: todayData };
-        activeIftar = { type: 'aksam', label: 'İftar Vaktine Kalan Süre', timeStr: todayData.aksam, diffSeconds: differenceInSeconds(iftarTime, now), prayerData: todayData };
+        activeImsak = { type: 'imsak', label: 'Sahura Ne kadar Kaldı?', timeStr: todayData.imsak, diffSeconds: differenceInSeconds(imsakTime, now), prayerData: todayData };
+        activeIftar = {
+            type: 'aksam',
+            label: 'İftar Vaktine Kalan Süre',
+            timeStr: todayData.aksam,
+            diffSeconds: differenceInSeconds(iftarTime, now),
+            prayerData: todayData,
+            nextDayTime: tomorrowData?.aksam
+        };
     } else if (isBefore(now, iftarTime)) {
         // Fasting time (Imsak to Iftar)
-        activeIftar = { type: 'aksam', label: 'İftar Vaktine Kalan Süre', timeStr: todayData.aksam, diffSeconds: differenceInSeconds(iftarTime, now), prayerData: todayData };
+        activeIftar = {
+            type: 'aksam',
+            label: 'İftar Vaktine Kalan Süre',
+            timeStr: todayData.aksam,
+            diffSeconds: differenceInSeconds(iftarTime, now),
+            prayerData: todayData,
+            nextDayTime: tomorrowData?.aksam
+        };
 
-        // For Sahur, we should show TOMORROW's Sahur time because today's has passed
-        const tomorrowStr = addDays(now, 1).toISOString().split('T')[0];
-        const tomorrowData = data.find((d: PrayerTime) => d.date === tomorrowStr);
         if (tomorrowData) {
             const nextImsakTime = parse(`${tomorrowData.date} ${tomorrowData.imsak}`, 'yyyy-MM-dd HH:mm', new Date());
-            activeImsak = { type: 'imsak', label: 'İmsak Vaktine (Sahur)', timeStr: tomorrowData.imsak, diffSeconds: differenceInSeconds(nextImsakTime, now), prayerData: tomorrowData };
+            activeImsak = { type: 'imsak', label: 'Sahura Ne kadar Kaldı?', timeStr: tomorrowData.imsak, diffSeconds: differenceInSeconds(nextImsakTime, now), prayerData: tomorrowData };
         }
     } else {
-        // After Iftar, look for next day's Imsak and next day's Iftar
-        const tomorrowStr = addDays(now, 1).toISOString().split('T')[0];
-        const tomorrowData = data.find((d: PrayerTime) => d.date === tomorrowStr);
-
+        // After Iftar
         if (tomorrowData) {
             const nextImsakTime = parse(`${tomorrowData.date} ${tomorrowData.imsak}`, 'yyyy-MM-dd HH:mm', new Date());
             const nextIftarTime = parse(`${tomorrowData.date} ${tomorrowData.aksam}`, 'yyyy-MM-dd HH:mm', new Date());
 
-            activeImsak = { type: 'imsak', label: 'İmsak Vaktine (Sahur)', timeStr: tomorrowData.imsak, diffSeconds: differenceInSeconds(nextImsakTime, now), prayerData: tomorrowData };
-            activeIftar = { type: 'aksam', label: 'İftar Vaktine Kalan Süre', timeStr: tomorrowData.aksam, diffSeconds: differenceInSeconds(nextIftarTime, now), prayerData: tomorrowData };
+            // Next day's iftar for the secondary timer
+            const dayAfterTomorrowStr = addDays(now, 2).toISOString().split('T')[0];
+            const dayAfterTomorrowData = data.find((d: PrayerTime) => d.date === dayAfterTomorrowStr);
 
-            // We want tomorrow's prayer data to show in the table if it's past Iftar (common preference)
+            activeImsak = { type: 'imsak', label: 'Sahura Ne kadar Kaldı?', timeStr: tomorrowData.imsak, diffSeconds: differenceInSeconds(nextImsakTime, now), prayerData: tomorrowData };
+            activeIftar = {
+                type: 'aksam',
+                label: 'İftar Vaktine Kalan Süre',
+                timeStr: tomorrowData.aksam,
+                diffSeconds: differenceInSeconds(nextIftarTime, now),
+                prayerData: tomorrowData,
+                nextDayTime: dayAfterTomorrowData?.aksam
+            };
+
             todayData = tomorrowData;
         }
     }
