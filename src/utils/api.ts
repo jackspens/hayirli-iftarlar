@@ -47,6 +47,7 @@ async function fetchPrayerTimes(city: string, year: number, month: number): Prom
         const data = await response.json();
 
         if (data.code === 200 && Array.isArray(data.data)) {
+            const isIstanbul = normalizedCity.toLowerCase() === 'istanbul' || normalizedCity === 'İstanbul';
             return data.data.map((day: any) => {
                 // Aladhan API: day.date.gregorian.date is typically "DD-MM-YYYY"
                 const rawDate = day.date.gregorian.date;
@@ -63,6 +64,10 @@ async function fetchPrayerTimes(city: string, year: number, month: number): Prom
                 const isoDate = `${yearVal}-${monthVal.toString().padStart(2, '0')}-${dayVal.toString().padStart(2, '0')}`;
                 const longDateStr = dateObj.toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric', weekday: 'long' });
 
+                // Istanbul: Aladhan Maghrib is 1 min ahead of official Diyanet time, correct it.
+                const rawMaghrib = timings.Maghrib.split(' ')[0];
+                const maghrib = isIstanbul ? subtractOneMinute(rawMaghrib) : rawMaghrib;
+
                 return {
                     dayIndex: 0,
                     dayStr: '',
@@ -72,7 +77,7 @@ async function fetchPrayerTimes(city: string, year: number, month: number): Prom
                     gunes: timings.Sunrise.split(' ')[0],
                     ogle: timings.Dhuhr.split(' ')[0],
                     ikindi: timings.Asr.split(' ')[0],
-                    aksam: timings.Maghrib.split(' ')[0],
+                    aksam: maghrib,
                     yatsi: timings.Isha.split(' ')[0]
                 };
             });
@@ -82,4 +87,13 @@ async function fetchPrayerTimes(city: string, year: number, month: number): Prom
         console.error(`Failed to fetch prayer times for ${city}:`, error);
         return [];
     }
+}
+
+// Helper: subtract 1 minute from a "HH:MM" time string
+function subtractOneMinute(timeStr: string): string {
+    const [h, m] = timeStr.split(':').map(Number);
+    const totalMinutes = h * 60 + m - 1;
+    const newH = Math.floor((totalMinutes + 1440) % 1440 / 60);
+    const newM = (totalMinutes + 1440) % 60;
+    return `${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')}`;
 }

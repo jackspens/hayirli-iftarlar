@@ -1,13 +1,15 @@
 import React from 'react';
 import { ISTANBUL_IMSAKIYE_2026, PrayerTime } from '../data/imsakiye';
-import { isBefore, parse, startOfDay } from 'date-fns';
+import { isBefore, parse } from 'date-fns';
 import clsx from 'clsx';
 import { CheckCircle2 } from 'lucide-react';
 
 export const MonthTimetable = ({ customData, city = 'İstanbul' }: { customData?: PrayerTime[]; city?: string }) => {
     const data = customData || ISTANBUL_IMSAKIYE_2026;
     const now = new Date();
-    const todayStart = startOfDay(now);
+    // Use local date math to avoid TZ shifts (toISOString would shift in UTC+3)
+    const y = now.getFullYear(), mo = String(now.getMonth() + 1).padStart(2, '0'), d = String(now.getDate()).padStart(2, '0');
+    const todayStr = `${y}-${mo}-${d}`;
 
     return (
         <div className="glass-panel mt-6 overflow-hidden flex flex-col">
@@ -31,8 +33,8 @@ export const MonthTimetable = ({ customData, city = 'İstanbul' }: { customData?
                     <tbody className="divide-y divide-slate-800/50">
                         {data.map((day) => {
                             const dayDate = parse(day.date, 'yyyy-MM-dd', new Date());
-                            const isToday = day.date === now.toISOString().split('T')[0];
-                            const isPast = isBefore(dayDate, todayStart) && !isToday;
+                            const isToday = day.date === todayStr;
+                            const isPast = isBefore(dayDate, parse(todayStr, 'yyyy-MM-dd', new Date())) && !isToday;
 
                             return (
                                 <tr

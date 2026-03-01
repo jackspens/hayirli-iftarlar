@@ -59,8 +59,9 @@ export function getDayEvents(now: Date, data: PrayerTime[] = ISTANBUL_IMSAKIYE_2
     let activeImsak: NextEvent | null = null;
     let activeIftar: NextEvent | null = null;
 
-    // Tomorrow's data for "next day" info
-    const tomorrowStr = addDays(now, 1).toISOString().split('T')[0];
+    // Tomorrow's data for "next day" info (use local date math to avoid TZ shift)
+    const tomorrow = addDays(now, 1);
+    const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
     const tomorrowData = data.find((d: PrayerTime) => d.date === tomorrowStr);
 
     if (isBefore(now, imsakTime)) {
@@ -95,8 +96,9 @@ export function getDayEvents(now: Date, data: PrayerTime[] = ISTANBUL_IMSAKIYE_2
             const nextImsakTime = parse(`${tomorrowData.date} ${tomorrowData.imsak}`, 'yyyy-MM-dd HH:mm', new Date());
             const nextIftarTime = parse(`${tomorrowData.date} ${tomorrowData.aksam}`, 'yyyy-MM-dd HH:mm', new Date());
 
-            // Next day's iftar for the secondary timer
-            const dayAfterTomorrowStr = addDays(now, 2).toISOString().split('T')[0];
+            // Next day's iftar for the secondary timer (local date math)
+            const dayAfterTomorrow = addDays(now, 2);
+            const dayAfterTomorrowStr = `${dayAfterTomorrow.getFullYear()}-${String(dayAfterTomorrow.getMonth() + 1).padStart(2, '0')}-${String(dayAfterTomorrow.getDate()).padStart(2, '0')}`;
             const dayAfterTomorrowData = data.find((d: PrayerTime) => d.date === dayAfterTomorrowStr);
 
             activeImsak = { type: 'imsak', label: 'İmsak Vaktine Kalan Süre', timeStr: tomorrowData.imsak, diffSeconds: differenceInSeconds(nextImsakTime, now), prayerData: tomorrowData };

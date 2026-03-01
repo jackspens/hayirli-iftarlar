@@ -157,11 +157,12 @@ function App() {
                         <p className="text-[10px] opacity-50">Son güncelleme: {new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                     </div>
 
-                    <div className="mt-4 flex flex-col items-center gap-2 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all">
+                    <div className="mt-4 flex flex-col items-center gap-2 opacity-60 hover:opacity-100 transition-all">
                         <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">Ziyaretçi Sayısı</span>
                         <img
-                            src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fjackspens.github.io%2Fhayirli-iftarlar&count_bg=%2310b981&title_bg=%231e293b&icon=at-and-t.svg&icon_color=%23E7E7E7&title=hits&edge_flat=false"
+                            src="https://visitor-badge.laobi.icu/badge?page_id=jackspens.hayirli-iftarlar&left_color=%231e293b&right_color=%2310b981&left_text=ziyaret%C3%A7i"
                             alt="Visitor Count"
+                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                         />
                     </div>
 
