@@ -13,6 +13,8 @@ function App() {
     const [imsakiye, setImsakiye] = useState<PrayerTime[]>([]);
     const [events, setEvents] = useState<DayEvents | null>(null);
     const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+    const [loading, setLoading] = useState(true);
+
     const loadData = useCallback(async (city: string) => {
         setLoading(true);
         try {
