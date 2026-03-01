@@ -3,62 +3,111 @@ import { Countdown } from './components/Countdown';
 import { Timetable } from './components/Timetable';
 import { MonthTimetable } from './components/MonthTimetable';
 import { getDayEvents, DayEvents } from './utils/timeTracker';
-import { MoonStar, CalendarDays } from 'lucide-react';
+import { MoonStar, CalendarDays, MapPin, ChevronDown } from 'lucide-react';
+import { ISTANBUL_IMSAKIYE_2026, PrayerTime } from './data/imsakiye';
+import { fetchPrayerTimes } from './utils/api';
+
+const CITIES = ['İstanbul', 'Ankara', 'İzmir', 'Bursa', 'Çanakkale'];
 
 function App() {
+    const [selectedCity, setSelectedCity] = useState('İstanbul');
+    const [currentPrayerData, setCurrentPrayerData] = useState<PrayerTime[]>(ISTANBUL_IMSAKIYE_2026);
     const [events, setEvents] = useState<DayEvents | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        async function loadCityData() {
+            if (selectedCity === 'İstanbul') {
+                setCurrentPrayerData(ISTANBUL_IMSAKIYE_2026);
+                return;
+            }
+
+            setIsLoading(true);
+            const now = new Date();
+            // Fetch current and potentially next month if we're near month-end
+            const times = await fetchPrayerTimes(selectedCity, now.getFullYear(), now.getMonth() + 1);
+            if (times.length > 0) {
+                setCurrentPrayerData(times);
+            }
+            setIsLoading(false);
+        }
+        loadCityData();
+    }, [selectedCity]);
 
     useEffect(() => {
         const update = () => {
-            setEvents(getDayEvents(new Date()));
+            setEvents(getDayEvents(new Date(), currentPrayerData));
         };
 
         update();
-        const interval = setInterval(update, 1000); // Check every second for countdown sync
+        const interval = setInterval(update, 1000);
         return () => clearInterval(interval);
-    }, []);
+    }, [currentPrayerData]);
 
     if (!events) return null;
 
     return (
         <div className="flex-1 flex flex-col items-center py-6 px-4 sm:py-10 w-full max-w-lg mx-auto">
-            <header className="w-full mb-6 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div className="p-3 bg-ramadan-500/20 rounded-2xl text-ramadan-400">
-                        <MoonStar size={28} />
+            <header className="w-full mb-6 flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-500">
+                            <MoonStar size={28} />
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-black text-slate-100 tracking-tight">Hayırlı İftarlar</h1>
+                            <div className="relative group mt-1 inline-flex items-center gap-1.5 cursor-pointer">
+                                <MapPin size={12} className="text-emerald-500" />
+                                <select
+                                    value={selectedCity}
+                                    onChange={(e) => setSelectedCity(e.target.value)}
+                                    className="bg-transparent text-emerald-400 font-bold text-xs appearance-none outline-none pr-4 hover:text-emerald-300 transition-colors"
+                                >
+                                    {CITIES.map(city => (
+                                        <option key={city} value={city} className="bg-slate-900 text-slate-100">{city}</option>
+                                    ))}
+                                </select>
+                                <ChevronDown size={10} className="text-emerald-500 absolute right-0 pointer-events-none group-hover:translate-y-0.5 transition-transform" />
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <h1 className="text-2xl font-extrabold text-slate-100 tracking-tight">Hayırlı İftarlar</h1>
-                        <p className="text-ramadan-400/80 font-medium text-xs mt-1">İstanbul</p>
+                    <div className="flex items-center gap-2 text-slate-400 text-[10px] sm:text-xs font-medium bg-slate-900/50 px-3 py-1.5 rounded-xl border border-slate-800">
+                        <CalendarDays size={14} className="text-emerald-500/50" />
+                        {events.currentDateStr}
                     </div>
-                </div>
-                <div className="flex items-center gap-2 text-slate-400 text-sm font-medium bg-slate-900/50 px-3 py-1.5 rounded-xl border border-slate-800">
-                    <CalendarDays size={14} />
-                    {events.currentDateStr}
                 </div>
             </header>
 
             <main className="w-full flex-1 flex flex-col gap-3">
-                {events.activeImsak || events.activeIftar ? (
-                    <div className="flex flex-col gap-3">
-                        {events.activeIftar && <Countdown event={events.activeIftar} isPrimary={true} />}
-                        {events.activeImsak && <Countdown event={events.activeImsak} isPrimary={false} />}
+                {isLoading ? (
+                    <div className="flex flex-col items-center justify-center p-20 gap-4">
+                        <div className="w-8 h-8 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
+                        <p className="text-slate-500 text-xs font-medium">Vakitler yükleniyor...</p>
                     </div>
                 ) : (
-                    <div className="glass-panel p-8 text-center mt-6">
-                        <h2 className="text-2xl font-bold text-ramadan-300">Ramazan Bayramı Mübarek Olsun!</h2>
-                        <p className="text-slate-400 mt-2">Bu seneki Ramazan ayını tamamladık.</p>
-                    </div>
-                )}
+                    <>
+                        {events.activeImsak || events.activeIftar ? (
+                            <div className="flex flex-col gap-3">
+                                {events.activeIftar && <Countdown event={events.activeIftar} isPrimary={true} />}
+                                {events.activeImsak && <Countdown event={events.activeImsak} isPrimary={false} />}
+                            </div>
+                        ) : (
+                            <div className="glass-panel p-8 text-center mt-6">
+                                <h2 className="text-2xl font-bold text-ramadan-300">Ramazan Bayramı Mübarek Olsun!</h2>
+                                <p className="text-slate-400 mt-2">Bu seneki Ramazan ayını tamamladık.</p>
+                            </div>
+                        )}
 
-                {events.prayerData && (
-                    <Timetable
-                        today={events.prayerData}
-                        nextEventType={events.activeImsak ? 'imsak' : (events.activeIftar ? 'aksam' : undefined)}
-                    />
-                )}
+                        {events.prayerData && (
+                            <Timetable
+                                today={events.prayerData}
+                                nextEventType={events.activeImsak ? 'imsak' : (events.activeIftar ? 'aksam' : undefined)}
+                            />
+                        )}
 
-                <MonthTimetable />
+                        <MonthTimetable customData={selectedCity === 'İstanbul' ? ISTANBUL_IMSAKIYE_2026 : currentPrayerData} />
+                    </>
+                )}
             </main>
 
             <footer className="w-full mt-10 text-center text-xs text-slate-500 font-medium pb-12 border-t border-slate-800/50 pt-8 space-y-2">

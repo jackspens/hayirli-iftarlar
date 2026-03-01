@@ -3,7 +3,8 @@ import { isBefore, parse, startOfDay } from 'date-fns';
 import clsx from 'clsx';
 import { CheckCircle2 } from 'lucide-react';
 
-export const MonthTimetable = () => {
+export const MonthTimetable = ({ customData }: { customData?: PrayerTime[] }) => {
+    const data = customData || ISTANBUL_IMSAKIYE_2026;
     const now = new Date();
     const todayStart = startOfDay(now);
 

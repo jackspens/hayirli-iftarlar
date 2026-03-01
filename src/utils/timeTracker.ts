@@ -16,30 +16,32 @@ export type DayEvents = {
     currentDateStr: string;
 };
 
-export function getDayEvents(now: Date): DayEvents {
+export function getDayEvents(now: Date, data: PrayerTime[] = ISTANBUL_IMSAKIYE_2026): DayEvents {
     const currentDayStr = now.toISOString().split('T')[0];
 
     // Find today's data
-    let todayData = ISTANBUL_IMSAKIYE_2026.find((d: PrayerTime) => d.date === currentDayStr);
+    let todayData = data.find((d: PrayerTime) => d.date === currentDayStr);
 
     const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     const localizedDateStr = now.toLocaleDateString('tr-TR', options);
 
     if (!todayData) {
         // If we're before Ramazan, return the first day's Imsak
-        const firstDay = parse(ISTANBUL_IMSAKIYE_2026[0].date, 'yyyy-MM-dd', new Date());
+        if (data.length === 0) return { activeIftar: null, activeImsak: null, prayerData: null, currentDateStr: localizedDateStr };
+
+        const firstDay = parse(data[0].date, 'yyyy-MM-dd', new Date());
         if (isBefore(now, firstDay)) {
-            const imsakTime = parse(`${ISTANBUL_IMSAKIYE_2026[0].date} ${ISTANBUL_IMSAKIYE_2026[0].imsak}`, 'yyyy-MM-dd HH:mm', new Date());
-            const iftarTime = parse(`${ISTANBUL_IMSAKIYE_2026[0].date} ${ISTANBUL_IMSAKIYE_2026[0].aksam}`, 'yyyy-MM-dd HH:mm', new Date());
+            const imsakTime = parse(`${data[0].date} ${data[0].imsak}`, 'yyyy-MM-dd HH:mm', new Date());
+            const iftarTime = parse(`${data[0].date} ${data[0].aksam}`, 'yyyy-MM-dd HH:mm', new Date());
 
             return {
                 activeImsak: {
-                    type: 'imsak', label: 'İlk Sahura Kalan Süre', timeStr: ISTANBUL_IMSAKIYE_2026[0].imsak, diffSeconds: differenceInSeconds(imsakTime, now), prayerData: ISTANBUL_IMSAKIYE_2026[0]
+                    type: 'imsak', label: 'İlk Sahura Kalan Süre', timeStr: data[0].imsak, diffSeconds: differenceInSeconds(imsakTime, now), prayerData: data[0]
                 },
                 activeIftar: {
-                    type: 'aksam', label: 'İlk İftara Kalan Süre', timeStr: ISTANBUL_IMSAKIYE_2026[0].aksam, diffSeconds: differenceInSeconds(iftarTime, now), prayerData: ISTANBUL_IMSAKIYE_2026[0]
+                    type: 'aksam', label: 'İlk İftara Kalan Süre', timeStr: data[0].aksam, diffSeconds: differenceInSeconds(iftarTime, now), prayerData: data[0]
                 },
-                prayerData: ISTANBUL_IMSAKIYE_2026[0],
+                prayerData: data[0],
                 currentDateStr: localizedDateStr
             };
         }
@@ -63,7 +65,7 @@ export function getDayEvents(now: Date): DayEvents {
 
         // For Sahur, we should show TOMORROW's Sahur time because today's has passed
         const tomorrowStr = addDays(now, 1).toISOString().split('T')[0];
-        const tomorrowData = ISTANBUL_IMSAKIYE_2026.find((d: PrayerTime) => d.date === tomorrowStr);
+        const tomorrowData = data.find((d: PrayerTime) => d.date === tomorrowStr);
         if (tomorrowData) {
             const nextImsakTime = parse(`${tomorrowData.date} ${tomorrowData.imsak}`, 'yyyy-MM-dd HH:mm', new Date());
             activeImsak = { type: 'imsak', label: 'Yarının Sahuruna Kalan Süre', timeStr: tomorrowData.imsak, diffSeconds: differenceInSeconds(nextImsakTime, now), prayerData: tomorrowData };
@@ -71,7 +73,7 @@ export function getDayEvents(now: Date): DayEvents {
     } else {
         // After Iftar, look for next day's Imsak and next day's Iftar
         const tomorrowStr = addDays(now, 1).toISOString().split('T')[0];
-        const tomorrowData = ISTANBUL_IMSAKIYE_2026.find((d: PrayerTime) => d.date === tomorrowStr);
+        const tomorrowData = data.find((d: PrayerTime) => d.date === tomorrowStr);
 
         if (tomorrowData) {
             const nextImsakTime = parse(`${tomorrowData.date} ${tomorrowData.imsak}`, 'yyyy-MM-dd HH:mm', new Date());
