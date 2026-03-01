@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Countdown } from './components/Countdown';
 import { Timetable } from './components/Timetable';
+import { MonthTimetable } from './components/MonthTimetable';
 import { getDayEvents, DayEvents } from './utils/timeTracker';
 import { MoonStar, CalendarDays } from 'lucide-react';
 
@@ -56,6 +57,8 @@ function App() {
                         nextEventType={events.activeImsak ? 'imsak' : (events.activeIftar ? 'aksam' : undefined)}
                     />
                 )}
+
+                <MonthTimetable currentDateStr={events.currentDateStr} />
             </main>
 
             <footer className="w-full mt-10 text-center text-xs text-slate-500 font-medium">

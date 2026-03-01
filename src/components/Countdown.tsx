@@ -17,12 +17,11 @@ export const Countdown = ({ event, isPrimary }: { event: NextEvent; isPrimary?: 
     const { h, m, s } = formatDuration(timeLeft);
     const isIftar = event.type === 'aksam';
 
-    // User requested orange for iftar, so we'll map aksam to orange.
-    // We'll keep imsak as blue/cyan.
-    const borderClass = isIftar ? "border-orange-500/50" : "border-cyan-500/30";
-    const glowClass = isIftar ? "bg-orange-500" : "bg-cyan-500";
-    const textClass = isIftar ? "text-orange-400" : "text-cyan-300";
-    const titleIconClass = isIftar ? "text-orange-500" : "text-cyan-400";
+    // Reverting to the golden/ramadan theme for iftar.
+    const borderClass = isIftar ? "border-ramadan-500/50" : "border-cyan-500/30";
+    const glowClass = isIftar ? "bg-ramadan-500" : "bg-cyan-500";
+    const textClass = isIftar ? "text-ramadan-400" : "text-cyan-300";
+    const titleIconClass = isIftar ? "text-ramadan-500" : "text-cyan-400";
 
     return (
         <div className={clsx(
