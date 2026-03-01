@@ -13,18 +13,20 @@ function App() {
     const [imsakiye, setImsakiye] = useState<PrayerTime[]>([]);
     const [events, setEvents] = useState<DayEvents | null>(null);
     const [showInstallPrompt, setShowInstallPrompt] = useState(false);
-    const [loading, setLoading] = useState(true);
-
     const loadData = useCallback(async (city: string) => {
         setLoading(true);
         try {
             const data = await fetchFullRamazanData(city);
+            setImsakiye(data);
             if (data.length > 0) {
-                setImsakiye(data);
                 setEvents(getDayEvents(new Date(), data));
+            } else {
+                setEvents(getDayEvents(new Date(), []));
             }
         } catch (error) {
             console.error('Failed to load data:', error);
+            setImsakiye([]);
+            setEvents(getDayEvents(new Date(), []));
         } finally {
             setLoading(false);
         }

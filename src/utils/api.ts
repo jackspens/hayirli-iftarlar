@@ -33,21 +33,25 @@ export async function fetchFullRamazanData(city: string): Promise<PrayerTime[]> 
 async function fetchPrayerTimes(city: string, year: number, month: number): Promise<PrayerTime[]> {
     const country = 'Turkey';
     const method = 13; // Diyanet
-    const url = `https://api.aladhan.com/v1/calendarByCity/${year}/${month}?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&method=${method}`;
+    // Normalize city names: trim and ensure first letter is uppercase if needed, 
+    // but encodeURIComponent should handle Turkish characters.
+    const normalizedCity = city.trim();
+    const url = `https://api.aladhan.com/v1/calendarByCity/${year}/${month}?city=${encodeURIComponent(normalizedCity)}&country=${encodeURIComponent(country)}&method=${method}`;
 
     try {
         const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
 
-        if (data.code === 200) {
-            return data.data.map((day: any, index: number) => {
-                const isoDate = day.date.iso;
+        if (data.code === 200 && Array.isArray(data.data)) {
+            return data.data.map((day: any) => {
+                const isoDate = day.date.iso; // "2026-03-01"
                 const timings = day.timings;
                 const dateObj = new Date(isoDate);
                 const longDateStr = dateObj.toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric', weekday: 'long' });
 
                 return {
-                    dayIndex: 0, // Will be set in fetchFullRamazanData
+                    dayIndex: 0,
                     dayStr: '',
                     longDateStr: longDateStr,
                     date: isoDate,
@@ -60,9 +64,9 @@ async function fetchPrayerTimes(city: string, year: number, month: number): Prom
                 };
             });
         }
-        throw new Error('API Error');
+        return [];
     } catch (error) {
-        console.error('Failed to fetch prayer times:', error);
+        console.error(`Failed to fetch prayer times for ${city}:`, error);
         return [];
     }
 }
