@@ -58,7 +58,7 @@ function App() {
                     />
                 )}
 
-                <MonthTimetable currentDateStr={events.currentDateStr} />
+                <MonthTimetable />
             </main>
 
             <footer className="w-full mt-10 text-center text-xs text-slate-500 font-medium">

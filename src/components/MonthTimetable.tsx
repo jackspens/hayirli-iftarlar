@@ -4,7 +4,7 @@ import { isBefore, parse, startOfDay } from 'date-fns';
 import clsx from 'clsx';
 import { CheckCircle2 } from 'lucide-react';
 
-export const MonthTimetable: React.FC<{ currentDateStr: string }> = ({ currentDateStr }) => {
+export const MonthTimetable = () => {
     const now = new Date();
     const todayStart = startOfDay(now);
 
